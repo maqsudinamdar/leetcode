@@ -6,6 +6,25 @@ using namespace std;
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0)
  
 
+int sumFourDivisors(vector<int>& nums) {
+        int ans = 0;
+        for (int num: nums) {
+            int cnt = 0, sum = 0;
+            for (int i = 1; i <= sqrt(num); i++) {
+                if (num % i == 0) {
+                    sum += i; cnt++;
+                    if (i !=  num / i) {
+                        sum += (num / i); cnt++;
+                    }   
+                }
+            }
+            if (cnt == 4) {
+                ans += sum;
+            }
+        }
+        return ans;
+}
+
 signed main() {
     fast;
     #ifndef ONLINE_JUDGE
@@ -15,15 +34,9 @@ signed main() {
     int t; cin>>t;
     while(t--) {
         int n; cin >> n;
-        vector<long long> a(n);
+        vector<int> a(n);
         for (int i = 0; i < n; i++) cin >> a[i];
-        int k; cin >> k;
-
-        int ans = -1;
-        int low = 0, high = 0;
-        while (high < n) {
-            if ()
-        }
+        cout << sumFourDivisors(a) << endl;
     }
     return 0;
 }
