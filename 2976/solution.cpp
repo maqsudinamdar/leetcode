@@ -6,56 +6,43 @@ using namespace std;
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0)
  
 
-long long dijkstra(char source, char target, vector<vector<pair<int, int>>>& adj) {
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> minHeap;
-    minHeap.push({0, source - 'a'});
-    vector<long long> dist(26, LLONG_MAX);
-    dist[source - 'a'] = 0;
-    while(!minHeap.empty()) {
-        auto node = minHeap.top();
-        int d = node.first; int ch = node.second;
-        minHeap.pop();
-        if (ch == target) break;
-        if (d > dist[ch]) {
-            continue;
-        }
-        for (auto &edge: adj[ch]) {
-            int v = edge.first; int weight = edge.second;
-            if (d + weight < dist[v]) {
-                dist[v] = d + weight;
-                minHeap.push({dist[v], v});   
-            }
-            
-        } 
-    } 
-    // cout << dist[target - 'a'] << endl;
-    return dist[target - 'a'];
-}
+
 
 long long minimumCost(string source, string target, vector<char>& original, vector<char>& changed, vector<int>& cost) {
-    long long totalCost = 0;
-    vector<vector<pair<int, int>>> adj(26);
+    vector<vector<long long>> dp(26, vector<long long>(26, LLONG_MAX));
     for (int i = 0; i < (int)cost.size(); i++) {
-        int ele = original[i] - 'a';
-        adj[ele].push_back({changed[i] - 'a', cost[i]});
+        int from = original[i] - 'a';
+        int to = changed[i] - 'a';
+        long long dist = cost[i];
+        if (from == to) {
+            continue;
+        } else {
+            dp[from][to] = dist;
+        }
     }
 
-    map<string, int> memo;
-
-    int size = source.size();
-    for (int i = 0; i < size; i++) {
-        if (source[i] != target[i]) {
-            string combination;
-            combination.push_back(source[i]);
-            combination.push_back(target[i]);
-            if (memo.find(combination) != memo.end()) {
-                totalCost += memo[combination];
-            } else {
-                long long dist = dijkstra(source[i], target[i], adj);
-                if (dist == LLONG_MAX) return -1;
-                memo[combination] = dist;
-                totalCost += dist;
+    for (int k = 0; k < 26; k++) {
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                if (dp[i][k] == LLONG_MAX || dp[k][j] == LLONG_MAX ) {
+                    continue;
+                } else {
+                    dp[i][j] = min(dp[i][j], dp[i][k] + dp[k][j]);
+                }
+                
             }
+        }
+    }
+
+    long long totalCost = 0;
+    for (int i = 0; i < source.size(); i++) {
+        if (source[i] == target[i]) {
+            continue;
+        } else {
+
+            long long wt = dp[source[i] - 'a'][target[i] - 'a'];
+            if (wt == LLONG_MAX) return -1;
+            totalCost += wt;
         }
     }
     return totalCost;
